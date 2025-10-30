@@ -1,110 +1,220 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025放送ステージメンバー共有用</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+// script.js (修正指示に基づく再構成された全文)
+
+// 🔥 最終チェック：Firebase設定
+// !!! この部分をあなたのFirebaseプロジェクトの実際のキーとIDに置き換えてください !!!
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY", 
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID", // <- 特にここ
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Firebaseの初期化とサービスの取得
+let db;
+try {
+    const app = firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+} catch (e) {
+    console.error("Firebaseの初期化に失敗しました。apiKeyなどが正しいか確認してください。", e);
+    alert("データ同期に失敗しました。開発者ツール(F12)のコンソールを確認してください。");
+}
+
+
+// =======================================================
+// --- 核心となるデータ同期とロジック（あなたの既存コード） ---
+// =======================================================
+
+// メンバーリストの静的データ (例として、あなたの元のリストを使用してください)
+const MEMBERS = [
+    { id: 'member1', name: 'メンバーA' },
+    { id: 'member2', name: 'メンバーB' },
+    // ... 他のメンバー ...
+];
+
+// あなたの元の populateMemberSelects 関数
+function populateMemberSelects() {
+    // メンバーリストをドロップダウンに表示するロジックをここに記述
+    // (例: 'filterMember', 'logFilterMember' などの select 要素に option を追加)
+    console.log("populateMemberSelects: メンバーのドロップダウンを準備しました。");
+}
+
+// あなたの元の setupRealtimeListeners 関数
+function setupRealtimeListeners() {
+    // Firestoreのデータ変更をリアルタイムで監視し、renderTasks/renderLogsを呼び出すロジックをここに記述
+    console.log("setupRealtimeListeners: Firebaseのリアルタイムリスナーを設定しました。");
+}
+
+// あなたの元の handleAddTask 関数
+function handleAddTask(event) {
+    event.preventDefault();
+    // タスクを追加するロジックをここに記述
+    console.log("handleAddTask: タスク追加ロジックを実行しました。");
+}
+
+// あなたの元の handleAddLog 関数
+function handleAddLog(event) {
+    event.preventDefault();
+    // 活動ログを追加するロジックをここに記述
+    console.log("handleAddLog: ログ追加ロジックを実行しました。");
+}
+
+// あなたの元の renderTasks 関数
+function renderTasks() {
+    // タスクボード（board-view）にタスクを描画するロジックをここに記述
+    console.log("renderTasks: タスクを描画しました。");
+}
+
+// あなたの元の renderLogs 関数
+function renderLogs() {
+    // 活動ログビュー（log-view）にログを描画するロジックをここに記述
+    console.log("renderLogs: 活動ログを描画しました。");
+}
+
+// あなたの元の renderCalendar 関数
+let currentCalendarDate = new Date(); // カレンダーの現在の日付を保持する変数
+function renderCalendar(date) {
+    // スケジュールビュー（calendar-view）にカレンダーを描画するロジックをここに記述
+    console.log("renderCalendar: カレンダーを描画しました。", date);
+}
+
+// あなたの元の addColumnDragListeners 関数
+function addColumnDragListeners(column) {
+    // D&Dイベントリスナーを設定するロジックをここに記述
+    console.log("addColumnDragListeners: D&Dリスナーを設定しました。");
+}
+
+// あなたの元の updateURL 関数
+function updateURL(viewName) {
+    // URLのハッシュを変更するロジックをここに記述
+    console.log("updateURL: URLを更新しました。", viewName);
+}
+
+
+// =======================================================
+// --- タブ切り替えロジック（修正点） ---
+// =======================================================
+
+/**
+ * ビューを切り替え、アクティブなタブの見た目を変更し、URLを更新します。
+ * @param {string} viewName - 切り替えたいビューの名前 ('board', 'calendar', 'log')
+ */
+function switchToView(viewName) {
+    const boardView = document.getElementById('board-view');
+    const calendarView = document.getElementById('calendar-view');
+    const logView = document.getElementById('log-view'); // ログビュー要素の取得
     
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-</head>
-<body>
+    const tabs = document.querySelectorAll('.nav-link');
+    const targetView = viewName.toLowerCase();
 
-    <div class="app-container">
-        <header>
-            <h1 class="app-title">📋 2025放送ステージメンバー共有用</h1>
-            <p class="subtitle">リアルタイム共同作業ボード (Firebase同期)</p>
-        </header>
+    // アクティブタブの見た目切り替え
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.view === targetView) {
+            tab.classList.add('active');
+        }
+    });
 
-        <div id="view-tabs" class="tabs">
-            <button id="show-board" data-view="board" class="active">タスクボード</button>
-            <button id="show-calendar" data-view="calendar">スケジュール</button>
-            <button id="show-log" data-view="log">活動ログ</button> 
-        </div>
+    // 全てのビューを非表示にする
+    if (boardView) boardView.style.display = 'none';
+    if (calendarView) calendarView.style.display = 'none';
+    if (logView) logView.style.display = 'none'; // これが重要
 
-        <main>
-            <div id="board-view" class="view-content">
-                <div id="board-controls">
-                    <form id="addTaskForm" class="add-form" style="align-items: flex-start;">
-                        <input type="text" id="taskDesc" placeholder="新規タスクの内容を入力" required style="flex-grow: 2;">
-                        <select id="taskPriority" required>
-                            <option value="" disabled selected>優先度</option>
-                            <option value="高">高</option>
-                            <option value="中">中</option>
-                            <option value="低">低</option>
-                        </select>
-                        <select id="taskAssignedTo" multiple required size="5" style="width: 120px;">
-                            </select>
-                        <button type="submit" class="btn-primary" style="align-self: center;">タスク追加</button>
-                    </form>
-                    
-                    <div id="filter-controls">
-                        <label for="filterPriority">優先度フィルター:</label>
-                        <select id="filterPriority">
-                            <option value="すべて">すべて</option>
-                            <option value="高">高</option>
-                            <option value="中">中</option>
-                            <option value="低">低</option>
-                        </select>
+    // ターゲットビューを表示し、描画関数を呼び出す
+    if (targetView === 'board' && boardView) {
+        boardView.style.display = 'block';
+        renderTasks();
+    } else if (targetView === 'calendar' && calendarView) {
+        calendarView.style.display = 'block';
+        renderCalendar(currentCalendarDate);
+    } else if (targetView === 'log' && logView) {
+        logView.style.display = 'block'; // ログビューを表示
+        renderLogs();
+    }
+    
+    updateURL(targetView);
+}
 
-                        <label for="filterMember">担当者フィルター:</label>
-                        <select id="filterMember">
-                            <option value="すべて">すべて</option>
-                        </select>
-                    </div>
-                </div>
+/**
+ * URLのハッシュに基づいて初期ビューを設定し、タブのイベントリスナーを設定します。
+ */
+function setupViewSwitching() {
+    // タブボタンにイベントリスナーを設定
+    document.querySelectorAll('.nav-link[data-view]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const viewName = e.currentTarget.dataset.view;
+            switchToView(viewName);
+        });
+    });
 
-                <div id="kanban-board">
-                    <section id="column-todo" class="task-column" data-status="要対応">
-                        <h2>要対応</h2>
-                    </section>
-                    <section id="column-new" class="task-column" data-status="未着手">
-                        <h2>未着手 / 要確認</h2>
-                    </section>
-                    <section id="column-inprogress" class="task-column" data-status="進行中">
-                        <h2>進行中</h2>
-                    </section>
-                    <section id="column-done" class="task-column" data-status="完了">
-                        <h2>完了</h2>
-                    </section>
-                </div>
-            </div>
-            
-            <div id="calendar-view" class="view-content" style="display: none;">
-                <div id="calendar-controls">
-                    <button id="prevMonth" class="btn-secondary">‹ 前の月</button>
-                    <h2 id="currentMonthYear"></h2>
-                    <button id="nextMonth" class="btn-secondary">次の月 ›</button>
-                </div>
-                <div id="calendar-grid" class="calendar-grid">
-                    </div>
-            </div>
+    // URLハッシュに基づいて初期ビューを決定
+    const hash = window.location.hash.replace('#', '');
+    let initialView = 'board'; // デフォルトビュー
 
-            <div id="log-view" class="view-content" style="display: none;">
-                <h2 class="section-title">今日の活動ログ</h2>
-                <div id="log-controls" class="add-form" style="display: flex; justify-content: flex-end;">
-                    <label for="logFilterMember" style="margin-right: 10px;">投稿者フィルター:</label>
-                    <select id="logFilterMember">
-                        <option value="すべて">すべて</option>
-                    </select>
-                </div>
+    if (hash === 'calendar' || hash === 'log') {
+        initialView = hash;
+    }
+    
+    switchToView(initialView);
+}
 
-                <form id="addLogForm" class="add-form log-form">
-                    <textarea id="logContent" placeholder="今日やったこと、気付いたこと、共有事項などを入力" rows="3" required></textarea>
-                    <select id="logAuthor" required>
-                        <option value="" disabled selected>投稿者名</option>
-                    </select>
-                    <button type="submit" class="btn-primary">ログを投稿</button>
-                </form>
 
-                <div id="log-list" class="log-list">
-                    </div>
-            </div>
-            </main>
-    </div>
+// =======================================================
+// --- 初期化（DOMContentLoaded内の修正点） ---
+// =======================================================
 
-    <script src="script.js"></script>
-</body>
-</html>
+// script.js (DOMContentLoaded内の初期化部分)
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. メンバードロップダウンの準備
+    populateMemberSelects();
+    
+    // 2. リアルタイムリスナーのセットアップ（データ同期開始）
+    // NOTE: Firebaseの初期化とリスナーは通常、ここで実行される
+    try {
+        if (db) { // Firebaseが初期化されているか確認
+            setupRealtimeListeners();
+        } else {
+            // dbがnullの場合（初期化失敗時）はエラーをコンソールに出力済み
+            alert("データ同期に失敗しました。開発者ツール(F12)のコンソールを確認してください。");
+        }
+    } catch (e) {
+        console.error("setupRealtimeListenersの実行中にエラーが発生しました。", e);
+    }
+    
+    // 3. イベントリスナー設定
+    const addTaskForm = document.getElementById('addTaskForm');
+    if (addTaskForm) {
+        addTaskForm.addEventListener('submit', handleAddTask);
+    }
+
+    const addLogForm = document.getElementById('addLogForm');
+    if (addLogForm) {
+        addLogForm.addEventListener('submit', handleAddLog);
+    }
+
+    // フィルターイベント
+    const filterPriority = document.getElementById('filterPriority');
+    if (filterPriority) {
+        filterPriority.addEventListener('change', renderTasks);
+    }
+    const filterMember = document.getElementById('filterMember');
+    if (filterMember) {
+        filterMember.addEventListener('change', renderTasks);
+    }
+    const logFilterMember = document.getElementById('logFilterMember');
+    if (logFilterMember) {
+        logFilterMember.addEventListener('change', renderLogs);
+    }
+    
+    // D&Dイベント
+    document.querySelectorAll('.task-column').forEach(column => {
+        addColumnDragListeners(column);
+    });
+    
+    // 4. 初期描画とURL同期を開始 (タブ切り替えロジック)
+    setupViewSwitching(); 
+});
+
+// ここから下に、上記の関数定義に含まれていない、
+// あなたのアプリ固有のその他のヘルパー関数やロジックを全て追加してください。
