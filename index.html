@@ -6,13 +6,16 @@
     <title>2025放送ステージメンバー共有用</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
     <div class="app-container">
         <header>
             <h1 class="app-title">📋 2025放送ステージメンバー共有用</h1>
-            <p class="subtitle">リアルタイム共同作業ボード (ローカル保存)</p>
+            <p class="subtitle">リアルタイム共同作業ボード (Firebase同期)</p>
         </header>
 
         <div id="view-tabs" class="tabs">
@@ -50,7 +53,7 @@
                         <label for="filterMember">担当者フィルター:</label>
                         <select id="filterMember">
                             <option value="すべて">すべて</option>
-                            </select>
+                        </select>
                     </div>
                 </div>
 
@@ -86,14 +89,14 @@
                     <label for="logFilterMember" style="margin-right: 10px;">投稿者フィルター:</label>
                     <select id="logFilterMember">
                         <option value="すべて">すべて</option>
-                        </select>
+                    </select>
                 </div>
 
                 <form id="addLogForm" class="add-form log-form">
                     <textarea id="logContent" placeholder="今日やったこと、気付いたこと、共有事項などを入力" rows="3" required></textarea>
                     <select id="logAuthor" required>
                         <option value="" disabled selected>投稿者名</option>
-                        </select>
+                    </select>
                     <button type="submit" class="btn-primary">ログを投稿</button>
                 </form>
 
@@ -106,3 +109,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
