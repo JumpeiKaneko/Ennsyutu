@@ -27,18 +27,17 @@
         <main>
             <div id="board-view" class="view-content">
                 <div id="board-controls">
-                    <form id="addTaskForm" class="add-form">
-                        <input type="text" id="taskDesc" placeholder="新規タスクの内容を入力" required>
+                    <form id="addTaskForm" class="add-form" style="align-items: flex-start;">
+                        <input type="text" id="taskDesc" placeholder="新規タスクの内容を入力" required style="flex-grow: 2;">
                         <select id="taskPriority" required>
                             <option value="" disabled selected>優先度</option>
                             <option value="高">高</option>
                             <option value="中">中</option>
                             <option value="低">低</option>
                         </select>
-                        <select id="taskAssignedTo" required>
-                            <option value="" disabled selected>担当者</option>
-                        </select>
-                        <button type="submit" class="btn-primary">タスク追加</button>
+                        <select id="taskAssignedTo" multiple required size="5" style="width: 120px;">
+                            </select>
+                        <button type="submit" class="btn-primary" style="align-self: center;">タスク追加</button>
                     </form>
                     
                     <div id="filter-controls">
@@ -109,4 +108,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
